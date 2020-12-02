@@ -25,7 +25,16 @@ usage() {
 
 # Proper user?: not exists or account id is at least 1000.
 checkUser(){
-	#...
+	UserID=$(id -u $1)
+	if [ $? -ne 0  ]
+	then exit 1
+	else
+		if [ $UserID -le 1000 ] then
+			echo "Refusing to remove the mail account with UID $UserID under 1000"
+			echo "No es posible"
+			exit 1
+		fi 
+	fi
 }
 
 # This function sends a message to syslog and to standard output if VERBOSE is true.
@@ -61,10 +70,12 @@ backup_dir() {
 }
 
 # Run as root.
-
-
+if [ $EUID -ne 0  ]
+then echo "Please run as root"
+exit 1
+fi
 #Parse the options
-while getopts XXXXXX o; do
+while getopts ":d:r:a:" o; do
     # OPTIND és variable interna de  getops, índex 
     #echo "OPTIND: $OPTIND OPTARG: $OPTARG"
     case "${o}" in
